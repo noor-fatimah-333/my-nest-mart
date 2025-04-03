@@ -6,18 +6,18 @@ import { GoogleStrategy } from './google.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
+import { UsersModule } from 'src/users/users.module';
+import { RefreshToken } from './refresh-token.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AuthModule]),
+    UsersModule,
+    TypeOrmModule.forFeature([AuthModule, RefreshToken]),
     PassportModule,
-    (() => {
-      const secret = process.env.JWT_SECRET || 'secretKey';
-      return JwtModule.register({
-        secret,
-        signOptions: { expiresIn: '3h' },
-      });
-    })(),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '3h' },
+    }),
   ],
   providers: [AuthService, GoogleStrategy, JwtStrategy],
   controllers: [AuthController],
