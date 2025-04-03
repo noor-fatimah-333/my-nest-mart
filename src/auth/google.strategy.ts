@@ -22,6 +22,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     const user = {
       email: profile.emails[0].value,
       name: profile.displayName,
+      sub: profile.id,
       accessToken,
     };
     done(null, user);
