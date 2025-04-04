@@ -6,12 +6,12 @@ import { GoogleStrategy } from './google.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
-import { UsersModule } from 'src/users/users.module';
 import { RefreshToken } from './refresh-token.entity';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [
-    UsersModule,
+    UserModule,
     TypeOrmModule.forFeature([AuthModule, RefreshToken]),
     PassportModule,
     JwtModule.register({
