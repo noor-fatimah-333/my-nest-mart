@@ -8,15 +8,21 @@ import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 import { RefreshToken } from './refresh-token.entity';
 import { UserModule } from 'src/user/user.module';
+import { UserService } from 'src/user/user.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     UserModule,
+    ConfigModule,
     TypeOrmModule.forFeature([AuthModule, RefreshToken]),
     PassportModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '3h' },
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get('JWT_SECRET'),
+        signOptions: { expiresIn: '1h' },
+      }),
     }),
   ],
   providers: [AuthService, GoogleStrategy, JwtStrategy],

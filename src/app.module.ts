@@ -15,7 +15,7 @@ import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
     UserModule,
     ProductsModule,
