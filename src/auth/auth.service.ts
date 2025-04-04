@@ -17,8 +17,18 @@ export class AuthService {
     private refreshTokenRepository: Repository<RefreshToken>,
   ) {}
   async validateUser(user: any) {
-    // In a real app, check if user exists in DB, and create if not.
-    return user;
+    const existingUser = await this.usersService.findByEmail(user.email);
+
+    if (!existingUser) {
+      const newUser = this.usersService.create({
+        email: user.email,
+        name: user.name,
+        googleId: user.id,
+      });
+      return newUser;
+    }
+
+    return existingUser;
   }
 
   async generateAccessToken(user: User) {
@@ -31,15 +41,26 @@ export class AuthService {
     const refreshToken = crypto.randomBytes(64).toString('hex');
     const expiresAt = addDays(new Date(), 30); // Refresh token is valid for 30 days
 
-    const newRefreshToken = this.refreshTokenRepository.create({
-      userId: user.id,
-      token: refreshToken,
-      expiresAt,
+    // Check if a refresh token already exists for the user
+    let existingToken = await this.refreshTokenRepository.findOne({
+      where: { googleId: user.id },
     });
+    if (existingToken) {
+      // Update the existing refresh token
+      existingToken.token = refreshToken;
+      existingToken.expiresAt = expiresAt;
+      await this.refreshTokenRepository.save(existingToken);
+    } else {
+      // Create a new refresh token if none exists
+      const newRefreshToken = this.refreshTokenRepository.create({
+        googleId: user.id,
+        token: refreshToken,
+        expiresAt,
+      });
+      await this.refreshTokenRepository.save(newRefreshToken);
+    }
 
-    await this.refreshTokenRepository.save(newRefreshToken);
-
-    return newRefreshToken;
+    return refreshToken;
   }
 
   // Method to validate refresh token and generate new access token
@@ -52,7 +73,7 @@ export class AuthService {
       throw new Error('Invalid or expired refresh token');
     }
 
-    const user = await this.usersService.findById(storedToken.userId);
+    const user = await this.usersService.findByGoogleId(storedToken.googleId);
 
     if (!user) {
       throw new Error('User not found');

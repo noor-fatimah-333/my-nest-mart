@@ -6,7 +6,7 @@ export class RefreshToken {
   id: string;
 
   @Column()
-  userId: string;
+  googleId: string;
 
   @Column()
   token: string; //refresh token

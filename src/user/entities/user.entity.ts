@@ -11,9 +11,15 @@ export class User {
   @Column({ default: true })
   isActive: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   password: string;
 
   @Column({ default: 'user' }) // 'admin' or 'user'
   role: string;
+
+  @Column({ nullable: true }) // New field for Google ID
+  googleId: string;
+
+  @Column({ nullable: true }) // New field for user's name
+  name: string;
 }

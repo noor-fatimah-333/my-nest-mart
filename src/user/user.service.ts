@@ -14,8 +14,15 @@ export class UserService {
   async findById(id: string) {
     return this.usersRepository.findOne({ where: { id } });
   }
+  async findByGoogleId(googleId: string) {
+    return this.usersRepository.findOne({ where: { googleId } });
+  }
+  async findByEmail(email: string) {
+    return this.usersRepository.findOne({ where: { email } });
+  }
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+    const user = this.usersRepository.create(createUserDto);
+    return this.usersRepository.save(user);
   }
 
   findAll() {
