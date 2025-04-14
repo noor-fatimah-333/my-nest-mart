@@ -7,6 +7,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { UserService } from 'src/user/user.service';
@@ -45,18 +46,18 @@ export class AuthController {
 
     res.cookie('access_token', access_token, {
       httpOnly: true,
-      // secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
       sameSite: 'Strict',
       maxAge: 1000 * 60 * 60 * 24, // 1 day
+      path: '/',
     });
 
     res.cookie('refresh_token', refresh_token, {
       httpOnly: true,
-      // secure: process.env.NODE_ENV === 'production',
       sameSite: 'Strict',
       maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
+      path: '/',
     });
-    return res.redirect(`http://localhost:3001`);
+    res.redirect('http://localhost:5000');
   }
 
   // Route to refresh access token
@@ -65,5 +66,40 @@ export class AuthController {
     const newAccessToken =
       await this.authService.refreshAccessToken(refreshToken);
     return { accessToken: newAccessToken }; // Return new access token
+  }
+
+  @Get('me')
+  async getMe(@Req() req: Request) {
+    const accessToken = req.cookies?.access_token;
+    if (!accessToken) {
+      return { user: null };
+    }
+
+    try {
+      const decoded = await this.authService.verifyAccessToken(accessToken);
+      const user = await this.userService.findByEmail(decoded.email);
+      return user;
+    } catch (err) {
+      console.error('Token invalid or expired:', err);
+      return { user: null };
+    }
+  }
+
+  @Post('logout')
+  async logout(@Req() req, @Res() res) {
+    console.log('logout endpoint hit', req.cookies);
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      sameSite: 'Strict',
+      path: '/',
+      maxAge: 0,
+    });
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      sameSite: 'Strict',
+      path: '/',
+      maxAge: 0,
+    });
+    return { message: 'Logged out successfully' };
   }
 }

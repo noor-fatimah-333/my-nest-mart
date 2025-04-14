@@ -31,6 +31,16 @@ export class AuthService {
     return existingUser;
   }
 
+  async verifyAccessToken(access_token: string): Promise<any> {
+    try {
+      const decoded = await this.jwtService.verifyAsync(access_token, {
+        secret: process.env.JWT_SECRET, // Make sure you’ve set this in your env
+      });
+      return decoded;
+    } catch (err) {
+      throw new Error('Invalid or expired access token');
+    }
+  }
   async generateAccessToken(user: User) {
     const payload = { email: user.email, sub: user.id };
     return this.jwtService.sign(payload);
