@@ -12,10 +12,10 @@ export class ProductsService {
     @InjectRepository(Product) private productsRepository: Repository<Product>,
   ) {}
 
-  create(createProductDto: CreateProductDto) {
-    const prod = this.productsRepository.create(createProductDto);
-    return this.productsRepository.save(prod);
-  }
+  // create(createProductDto: CreateProductDto) {
+  //   const prod = this.productsRepository.create(createProductDto);
+  //   return this.productsRepository.save(prod);
+  // }
 
   findAll() {
     return this.productsRepository.find();
@@ -36,12 +36,30 @@ export class ProductsService {
   async seedDummyProducts() {
     const { data } = await axios.get('https://dummyjson.com/products');
 
-    const products = data.products.map((p) => ({
-      name: p.title,
-      price: p.price,
-      image: p.thumbnail,
-    }));
-
+    const products = data.products.map((product: Product) => {
+      return this.productsRepository.create({
+        title: product.title,
+        description: product.description,
+        category: product.category,
+        price: product.price,
+        discountPercentage: product.discountPercentage,
+        rating: product.rating,
+        stock: product.stock,
+        tags: product.tags,
+        brand: product?.brand,
+        sku: product.sku,
+        weight: product.weight,
+        dimensions: product.dimensions,
+        warrantyInformation: product.warrantyInformation,
+        shippingInformation: product.shippingInformation,
+        availabilityStatus: product.availabilityStatus,
+        returnPolicy: product.returnPolicy,
+        minimumOrderQuantity: product.minimumOrderQuantity,
+        meta: product.meta,
+        images: product.images,
+        thumbnail: product.thumbnail,
+      });
+    });
     await this.productsRepository.save(products);
     return { message: 'Dummy products seeded successfully' };
   }

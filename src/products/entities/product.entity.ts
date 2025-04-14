@@ -6,11 +6,71 @@ export class Product {
   id: number;
 
   @Column()
-  name: string;
+  title: string;
 
-  @Column('float')
-  price: number;
+  @Column('text')
+  description: string;
 
   @Column()
-  image: string;
+  category: string;
+
+  @Column('decimal')
+  price: number;
+
+  @Column('decimal')
+  discountPercentage: number;
+
+  @Column('decimal')
+  rating: number;
+
+  @Column()
+  stock: number;
+
+  @Column('simple-array')
+  tags: string[];
+
+  @Column({ nullable: true })
+  brand: string;
+
+  @Column({ nullable: true })
+  sku: string;
+
+  @Column('decimal')
+  weight: number;
+
+  @Column('json')
+  dimensions: {
+    width: number;
+    height: number;
+    depth: number;
+  };
+
+  @Column({ nullable: true })
+  warrantyInformation: string;
+
+  @Column({ nullable: true })
+  shippingInformation: string;
+
+  @Column({ nullable: true })
+  availabilityStatus: string;
+
+  @Column({ nullable: true })
+  returnPolicy: string;
+
+  @Column()
+  minimumOrderQuantity: number;
+
+  @Column('json', { nullable: true })
+  meta: {
+    createdAt: string;
+    updatedAt: string;
+    barcode: string;
+    qrCode: string;
+  };
+
+  @Column('simple-array')
+  images: string[];
+
+  @Column()
+  thumbnail: string;
 }

@@ -1,12 +1,31 @@
-import { IsNumber, IsString } from 'class-validator';
-
 export class CreateProductDto {
-  @IsString()
-  name: string;
-
-  @IsNumber()
+  title: string;
+  description: string;
+  category: string;
   price: number;
-
-  @IsString()
-  image: string;
+  discountPercentage: number;
+  rating: number;
+  stock: number;
+  tags: string[];
+  brand: string;
+  sku: string;
+  weight: number;
+  dimensions: {
+    width: number;
+    height: number;
+    depth: number;
+  };
+  warrantyInformation: string;
+  shippingInformation: string;
+  availabilityStatus: string;
+  returnPolicy: string;
+  minimumOrderQuantity: number;
+  meta: {
+    createdAt: string;
+    updatedAt: string;
+    barcode: string;
+    qrCode: string;
+  };
+  images: string[];
+  thumbnail: string;
 }
